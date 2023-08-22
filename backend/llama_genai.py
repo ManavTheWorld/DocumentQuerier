@@ -45,7 +45,7 @@ service_context = ServiceContext.from_defaults(
     embed_model=embed_model
 )
 
-documents = SimpleDirectoryReader('data\llama_index\documents').load_data()
+documents = SimpleDirectoryReader('data/llama_index/documents').load_data()
 index = VectorStoreIndex.from_documents(documents, service_context=service_context, show_progress=True)
 query_engine = index.as_query_engine()
 
