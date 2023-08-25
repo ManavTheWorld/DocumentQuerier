@@ -6,7 +6,7 @@ from llama_index.prompts.prompts import SimpleInputPrompt
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from llama_index import LangchainEmbedding, ServiceContext
-from constants import MODELS, REVISIONS, PROMPTS
+from constants import MODELS, REVISIONS, PROMPTS, PATHS
 
 model_name_or_path = MODELS.CHAT_LLMS.thebloke_13b
 model_basename = "model"

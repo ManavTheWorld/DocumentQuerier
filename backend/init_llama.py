@@ -6,7 +6,7 @@ from llama_index.prompts.prompts import SimpleInputPrompt
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from llama_index import LangchainEmbedding, ServiceContext
-from constants import MODELS, REVISIONS
+from constants import MODELS, REVISIONS, PATHS
 
 def init_llm():
   model_name_or_path = MODELS.CHAT_LLMS.thebloke_13b
@@ -24,7 +24,7 @@ def init_llm():
           device="cuda:0",
           quantize_config=None)
 
-  system_prompt = "You are a Q&A assistant named Moo. Your goal is to answer questions as accurately as possible based on the instructions and context provided."
+  system_prompt = "You are a Q&A assistant. Your goal is to answer questions as accurately as possible based on the instructions and context provided."
 
   llm = HuggingFaceLLM(context_window=4096,
                       max_new_tokens=256,
@@ -44,7 +44,7 @@ def init_llm():
       embed_model=embed_model
   )
 
-  documents = SimpleDirectoryReader('data/llama_index/documents').load_data()
+  documents = SimpleDirectoryReader(PATHS.documents).load_data()
   index = VectorStoreIndex.from_documents(documents, service_context=service_context, show_progress=True)
   query_engine = index.as_query_engine()
   print('Done loading index. Ready for queries.\n')
