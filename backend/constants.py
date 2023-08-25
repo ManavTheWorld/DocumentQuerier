@@ -21,5 +21,7 @@ class REVISIONS:
     eight_bit_128g = 'gptq-8bit-128g-actorder_True'
     
 class PROMPTS:
-    
     fun = "You are a Q&A assistant. Your goal is to answer questions as accurately as possible based on the instructions and context provided."
+    
+class PATHS:
+    documents = 'documents'

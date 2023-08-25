@@ -1,82 +1,106 @@
-
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { CircularProgress } from '@mui/material';
 
-export default function ChatComponent() {
+function ChatComponent() {
+    const [inputValue, setInputValue] = useState('');
     const [messages, setMessages] = useState([]);
-    const [inputValue, setInputValue] = useState("");
-    const chatBoxRef = useRef(null);
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [file, setFile] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const chatEndRef = useRef(null);
 
     useEffect(() => {
-        const startLLM = async () => {
-            try {
-                await fetch("http://localhost:5000/llm/start", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-            } catch (error) {
-                setMessages([{ type: 'error', text: 'Error: Unable to initialize LLM!' }]);
-            }
-        };
-
-        startLLM();
-
-        const chatBox = chatBoxRef.current;
-        chatBox.scrollTop = chatBox.scrollHeight;
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    const handleMessageSend = async () => {
-        if (inputValue.trim() !== "") {
-            setMessages([...messages, { type: 'user', text: inputValue }]);
-
-            try {
-                const response = await fetch("http://localhost:5000/llm/query", {
-                    method: "POST",
+    const handleInitialize = async () => {
+        setLoading(true);
+        try {
+            if (file) {
+                const formData = new FormData();
+                formData.append('document', file);
+                await axios.post('http://localhost:5000/backend/documents', formData, {
                     headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ query: inputValue })
+                        'Content-Type': 'multipart/form-data',
+                    }
                 });
-
-                const data = await response.json();
-
-                if (data.response) {
-                    setMessages(prev => [...prev, { type: 'llm', text: data.response }]);
-                } else {
-                    throw new Error('Invalid response from server');
-                }
-
-            } catch (error) {
-                setMessages(prev => [...prev, { type: 'error', text: 'Error: Unable to fetch response!' }]);
             }
+            const response = await axios.post('http://localhost:5000/llm/start');
+            if (response.data.status === 'success') {
+                setIsInitialized(true);
+            } else {
+                alert('Failed to initialize');
+            }
+        } catch (error) {
+            alert('Error during initialization. Please check the backend.');
+        }
+        setLoading(false);
+    };
 
-            setInputValue("");
+    const handleMessageSubmit = async (e) => {
+        e.preventDefault();
+        if (inputValue.trim() === '') return;
+        setMessages(prev => [...prev, { sender: 'User', text: inputValue }]);
+        try {
+            const response = await axios.post('http://localhost:5000/llm/query', { query: inputValue });
+            setMessages(prev => [...prev, { sender: 'AI', text: response.data.response }]);
+            setInputValue('');
+        } catch (error) {
+            alert('Error fetching response. Please check the backend.');
         }
     };
 
+    if (loading) {
+        return <div>
+            <h2>Parsing Documents and Generating Embeddings</h2>
+            <CircularProgress />
+        </div>;
+    }
+
     return (
-        <div className="chat-container mt-4 border p-4 rounded-lg w-3/4 mx-auto">
-            <div ref={chatBoxRef} className="chat-box max-h-128 overflow-y-auto mb-4 bg-white p-4 rounded">
-                {messages.map((message, index) => (
-                    <div key={index} className={`mb-2 p-2 rounded-lg ${message.type === 'user' ? 'bg-gray-400' : message.type === 'llm' ? 'bg-blue-400' : 'bg-red-400'}`}>
-                        <strong>{message.type === 'user' ? 'User:' : message.type === 'llm' ? 'AI:' : 'Error:'}</strong> {message.text}
-                    </div>
-                ))}
-            </div>
-            <div className="chat-input flex items-center">
-                <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    className="border rounded-l-lg p-2 flex-1 mr-2 text-black"
-                    placeholder="Type your message..."
-                />
-                <button onClick={handleMessageSend} className="bg-blue-600 text-white p-2 rounded-r-lg">
-                    Send
-                </button>
-            </div>
+        <div>
+            {!isInitialized ? (
+                <div>
+                    <input type="file" onChange={e => setFile(e.target.files[0])} />
+                    <button 
+                        onClick={handleInitialize}
+                        style={{ backgroundColor: '#0070f3', color: 'white', padding: '10px 20px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                        Start AI and Digest Documents
+                    </button>
+                </div>
+            ) : (
+                <div style={{ width: '500px', height: '600px', border: '1px solid #333', overflowY: 'scroll', padding: '20px', backgroundColor: '#181818' }}>
+                    {messages.map((message, index) => (
+                        <div key={index} style={{ marginBottom: '15px', display: 'flex', flexDirection: 'column' }}>
+                            <strong style={{ marginBottom: '5px', color: '#f1f1f1' }}>{message.sender} &gt;</strong>
+                            <div style={{
+                                padding: '10px',
+                                borderRadius: '10px',
+                                backgroundColor: message.sender === 'User' ? '#0070f3' : '#242424',
+                                color: message.sender === 'User' ? 'white' : '#f1f1f1',
+                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                            }}>
+                                {message.text}
+                            </div>
+                        </div>
+                    ))}
+                    <div ref={chatEndRef}></div>
+                    <form onSubmit={handleMessageSubmit} style={{ position: 'absolute', bottom: '10px', width: '460px' }}>
+                        <input
+                            value={inputValue}
+                            onChange={e => setInputValue(e.target.value)}
+                            style={{ width: '360px', padding: '10px', marginRight: '10px', borderRadius: '4px', backgroundColor: '#242424', color: 'white', border: '1px solid #333' }}
+                            placeholder="Type your queries about your document here"
+                        />
+                        <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Send</button>
+                    </form>
+                </div>
+            )}
         </div>
     );
-}
+                        }
+                            
+    export default ChatComponent;
