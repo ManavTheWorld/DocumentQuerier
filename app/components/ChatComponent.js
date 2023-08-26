@@ -53,12 +53,20 @@ function ChatComponent() {
     };
 
     if (loading) {
-        return <div>
-            <h2>Parsing Documents and Generating Embeddings</h2>
-            <CircularProgress />
-        </div>;
+        return (
+            <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                height: '100vh' 
+            }}>
+                <h2>Parsing Documents and Generating Embeddings</h2>
+                <CircularProgress />
+            </div>
+        );
     }
-
+    
     return (
         <div>
             {!isInitialized ? (
