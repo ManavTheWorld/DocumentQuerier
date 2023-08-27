@@ -12,6 +12,9 @@ dataclasses-json
 datasets
 dill
 filelock
+flask
+python-dotenv
+flask-cors
 frozenlist
 fsspec
 greenlet
