@@ -8,6 +8,7 @@ class MODELS:
     class CHAT_LLMS:
         thebloke_30b = 'TheBloke/hippogriff-30b-chat-GPTQ'
         thebloke_13b = 'TheBloke/CodeUp-Llama-2-13B-Chat-HF-GPTQ'
+        thebloke_7b = 'TheBloke/Llama-2-7b-Chat-GPTQ'
     class EMBED_MODELS:
         sentence_transformers_all_mpnet_base_v2 = 'sentence-transformers/all-mpnet-base-v2'
 

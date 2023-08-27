@@ -62,4 +62,4 @@ def upload_file():
     return jsonify({'error': 'Invalid file type'}), 400
 
 if __name__ == "__main__":
-    api.run(port=5000, debug=True)
+    api.run(port=3000, debug=True)
