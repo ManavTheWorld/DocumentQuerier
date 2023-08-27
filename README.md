@@ -30,6 +30,8 @@ For this application, you must have:
 - Python 3.10-3.11
 - Node JS v18.x or higher
 - NVIDIA CUDA (if using a GPTQ model): https://developer.nvidia.com/cuda-downloads
+- A HuggingFace personal access token: https://huggingface.co/
+- At least 20GB of disk space to download the model
 ```
 
 ### Instructions
