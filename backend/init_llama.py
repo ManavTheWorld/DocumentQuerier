@@ -24,7 +24,7 @@ def init_llm():
           device="cuda:0",
           quantize_config=None)
 
-  system_prompt = "You are a Q&A assistant. Your goal is to answer questions as accurately as possible based on the instructions and context provided."
+  system_prompt = "You are a document querying assistant. Your goal is to answer customer text concisely. Organize your thoughts into numbered points as often as possible, if applicable.  If you do not know the answer, your only answer is: I'm sorry. I didn't quite understand. Can you rephrase your question?"
 
   llm = HuggingFaceLLM(context_window=4096,
                       max_new_tokens=256,

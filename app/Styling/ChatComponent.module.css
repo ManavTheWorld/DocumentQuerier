@@ -1,3 +1,22 @@
+
+.pageContainer {
+    display: flex; /* To arrange child components horizontally */
+    width: 100vw;
+    height: 100vh;
+}
+
+.panel {
+    flex: 1; /* Panel taking up 1/8 of the space */
+    background-color: #2a2a2a; /* Some dark color for the panel, adjust as needed */
+    border-right: 1px solid #333; /* Separate the panel and chat window */
+}
+
+.chatContainer {
+    flex: 7; /* Chat window taking up the rest */
+    /* Rest of the styles remain same as you provided */
+}
+
+
 .loadingContainer {
     display: flex;
     flex-direction: column;
@@ -16,8 +35,8 @@
 }
 
 .chatContainer {
-    width: 500px;
-    height: 600px;
+    width: 1000px;
+    height: 700px;
     border: 1px solid #333;
     overflow-y: scroll;
     padding: 20px;
@@ -27,15 +46,21 @@
 .message {
     margin-bottom: 15px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Ensures that messages are stacked vertically */
+    align-items: flex-start;
 }
 
 .sender {
-    margin-bottom: 5px;
+    margin-right: 10px;  /* Add a bit of spacing between the sender and the message */
     color: #f1f1f1;
 }
 
+.sender.user {
+    align-self: flex-end; /* Pushes the sender to the end of the flex container */
+}
+
 .userMessage {
+    display: inline-flex;
     padding: 10px;
     border-radius: 10px;
     background-color: #0070f3;
@@ -44,11 +69,30 @@
 }
 
 .aiMessage {
+    display: inline-flex;
     padding: 10px;
     border-radius: 10px;
     background-color: #242424;
     color: #f1f1f1;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.userMessageContainer {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #0070f3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    max-width: 100%; /* Ensures it doesn't overflow parent */
+    display: inline-block; /* Use inline-block to wrap the content */
+}
+
+.aiMessageContainer {
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #242424;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    max-width: 100%; 
+    display: inline-block; 
 }
 
 .form {
@@ -58,7 +102,7 @@
 }
 
 .input {
-    width: 360px;
+    width: 1000px;
     padding: 10px;
     margin-right: 10px;
     border-radius: 4px;
@@ -74,4 +118,82 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
+}
+
+@keyframes wavy {
+    0%, 60%, 100% {
+        opacity: 0.6;
+    }
+    30% {
+        opacity: 1;
+    }
+}
+
+.wavyText {
+    display: inline-block;
+    animation: wavy 1.5s infinite;
+    content: '...';
+    margin-left: 5px;
+}
+
+.markdownContent {
+    display: block;
+    width: 100%;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.markdownContent p {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.markdownContent p:first-child {
+    padding-top: 0;
+}
+
+.markdownContent p:last-child {
+    padding-bottom: 0;
+}
+
+.markdownContent ul {
+    list-style-type: disc;
+    margin-left: 30px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.markdownContent ol {
+    list-style-type: decimal;
+    margin-left: 30px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Styling the scrollbar for webkit browsers */
+.chatContainer::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chatContainer::-webkit-scrollbar-track {
+    background-color: #2a2a2a; /* Dark background for the track */
+}
+
+.chatContainer::-webkit-scrollbar-thumb {
+    background-color: #888; /* Light grey for the scroller */
+    border-radius: 5px;
+}
+
+/* Styling for Firefox */
+.chatContainer {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #2a2a2a;
+}
+
+.userPhoto, .aiPhoto {
+    width: 40px; /* Size of the photo */
+    height: 40px;
+    border-radius: 50%; /* Makes it circular */
+    object-fit: cover; /* Ensure the image covers the div without distorting */
+    margin-right: 10px; /* Spacing between the photo and the text */
 }
