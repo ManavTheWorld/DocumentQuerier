@@ -30,6 +30,8 @@ For this application, you must have:
 - Python 3.10-3.11
 - Node JS v18.x or higher
 - NVIDIA CUDA (if using a GPTQ model): https://developer.nvidia.com/cuda-downloads
+- A HuggingFace personal access token: https://huggingface.co/
+- At least 20GB of disk space to download the model
 ```
 
 ### Instructions
@@ -49,4 +51,5 @@ For this application, you must have:
 1. Run the application with `npm start`. This will start the frontend and backend server.
 2. Upload a document you want to query.
 3. Generate document embeddings and start the AI. Click the blue button.
-4. Once loaded, a chat window will appear and you can query the AI about your documents.
+4. If you are starting it for the first time, have your HuggingFace PAT ready and paste it in when prompted. The models will download before it runs.
+5. Once loaded, a chat window will appear and you can query the AI about your documents.
