@@ -3,6 +3,18 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { CircularProgress } from '@mui/material';
 import styles from '../Styling/ChatComponent.module.css'
+import ReactMarkdown from 'react-markdown';
+
+function formatMessageForMarkdown(text) {
+    // Replace '•' with '- ' for bullets, '*' with '- ' for compatibility and prepare numbered lists
+    let replacedText = text.replace(/•/g, '- ').replace(/\*/g, '- ').replace(/(\d+)\./g, "$1. ");
+    replacedText = text.replace('�', '')
+    console.log("Transformed Text:", replacedText);  // Log the transformed text for verification
+    return replacedText;
+}
+
+
+
 
 function ChatComponent() {
     const [inputValue, setInputValue] = useState('');
@@ -10,6 +22,7 @@ function ChatComponent() {
     const [isInitialized, setIsInitialized] = useState(false);
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isWaitingForAI, setIsWaitingForAI] = useState(false);
     const chatEndRef = useRef(null);
 
     useEffect(() => {
@@ -29,7 +42,7 @@ function ChatComponent() {
                 });
             }
             const response = await axios.post('http://localhost:5000/llm/start');
-            if (response.data.status === 'success') {
+            if (response.data.status === 'success' || response.data.status === 'already initialized') {
                 setIsInitialized(true);
             } else {
                 alert('Failed to initialize');
@@ -43,15 +56,30 @@ function ChatComponent() {
     const handleMessageSubmit = async (e) => {
         e.preventDefault();
         if (inputValue.trim() === '') return;
+    
+        // Append user's message
         setMessages(prev => [...prev, { sender: 'User', text: inputValue }]);
+    
+        // Append a temporary AI "typing" message
+        setMessages(prev => [...prev, { sender: 'AI', text: '...' }]);
+    
         try {
             const response = await axios.post('http://localhost:5000/llm/query', { query: inputValue });
-            setMessages(prev => [...prev, { sender: 'AI', text: response.data.response }]);
+            console.log("AI Response:", response.data.response);
+            // Update the last AI message from "..." to the actual response
+            setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].text = response.data.response;
+                return newMessages;
+            });
+    
             setInputValue('');
         } catch (error) {
             alert('Error fetching response. Please check the backend.');
         }
     };
+    
+    
 
     if (loading) {
         return (
@@ -73,14 +101,18 @@ function ChatComponent() {
                 </div>
             ) : (
                 <div className={styles.chatContainer}>
-                    {messages.map((message, index) => (
-                        <div key={index} className={styles.message}>
-                            <strong className={styles.sender}>{message.sender} &gt;</strong>
-                            <div className={message.sender === 'User' ? styles.userMessage : styles.aiMessage}>
-                                {message.text}
-                            </div>
+                {messages.map((message, index) => (
+                    <div key={index} className={styles.message}>
+                    <strong className={styles.sender}>{message.sender} &gt;</strong>
+                    <div className={message.sender === 'User' ? styles.userMessageContainer : styles.aiMessageContainer}>
+                        <div className={styles.markdownContent}>
+                            <ReactMarkdown>
+                                {formatMessageForMarkdown(message.text)}
+                            </ReactMarkdown>
                         </div>
-                    ))}
+                    </div>
+                    </div>
+                ))}
                     <div ref={chatEndRef}></div>
                     <form onSubmit={handleMessageSubmit} className={styles.form}>
                         <input
