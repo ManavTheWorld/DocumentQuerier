@@ -37,3 +37,6 @@ next-env.d.ts
 /backend/__pycache__
 /venv
 /backend/documents/*
+
+*:Zone.Identifier
+```
