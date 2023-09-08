@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown';
 function formatMessageForMarkdown(text) {
     // Replace '•' with '- ' for bullets, '*' with '- ' for compatibility and prepare numbered lists
     let replacedText = text.replace(/•/g, '- ').replace(/\*/g, '- ').replace(/(\d+)\./g, "$1. ");
-    replacedText = text.replace('�', '')
+    replacedText = text.replace('�', 'rt')
     console.log("Transformed Text:", replacedText);  // Log the transformed text for verification
     return replacedText;
 }
@@ -100,21 +100,37 @@ function ChatComponent() {
                     </button>
                 </div>
             ) : (
-                <div className={styles.chatContainer}>
-                {messages.map((message, index) => (
-                    <div key={index} className={styles.message}>
-                    <strong className={styles.sender}>{message.sender} &gt;</strong>
-                    <div className={message.sender === 'User' ? styles.userMessageContainer : styles.aiMessageContainer}>
-                        <div className={styles.markdownContent}>
-                            <ReactMarkdown>
-                                {formatMessageForMarkdown(message.text)}
-                            </ReactMarkdown>
-                        </div>
+                <div className={styles.chatSection}> {/* Wrapped chatContainer and form inside chatSection */}
+                    <div className={styles.chatContainer}>
+                        {messages.map((message, index) => (
+                            <div 
+                                key={index} 
+                                className={`${styles.message} ${message.sender === 'User' ? styles.rightAligned : ''}`}
+                                >
+                                <img 
+                                    className={message.sender === 'User' ? styles.userPhoto : styles.aiPhoto} 
+                                    src={`/images/${message.sender}.svg`} 
+                                    alt={message.sender} 
+                                />
+                                <div 
+                                    className={message.sender === 'User' ? styles.userMessageContainer : styles.aiMessageContainer}
+                                >
+                                    <div className={styles.markdownContent}>
+                                    {message.text === '...' ? 
+                                    <div className={styles.wavyText}>
+                                    <span>.</span><span>.</span><span>.</span>
+                                    </div> : 
+                                    <ReactMarkdown>
+                                        {formatMessageForMarkdown(message.text)}
+                                    </ReactMarkdown>
+                                   }
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        <div ref={chatEndRef}></div>
                     </div>
-                    </div>
-                ))}
-                    <div ref={chatEndRef}></div>
-                    <form onSubmit={handleMessageSubmit} className={styles.form}>
+                    <form onSubmit={handleMessageSubmit} className={styles.form}> {/* Moved form outside chatContainer */}
                         <input
                             value={inputValue}
                             onChange={e => setInputValue(e.target.value)}
