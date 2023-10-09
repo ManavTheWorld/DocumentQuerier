@@ -1,11 +1,14 @@
 from transformers import AutoTokenizer, pipeline, logging
+from constants import MODELS, REVISIONS, PATHS, SECRETS
+import os
+os.environ["OPENAI_API_KEY"] = SECRETS.KEYS.OPEN_AI_KEY
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from llama_index import VectorStoreIndex, SimpleDirectoryReader, ServiceContext
 from llama_index.llms import HuggingFaceLLM
 from llama_index.prompts.prompts import SimpleInputPrompt
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from llama_index import LangchainEmbedding, ServiceContext
+from llama_index import LangchainEmbedding, ServiceContext, GPTVectorStoreIndex, LLMPredictor
 from constants import MODELS, REVISIONS, PATHS
 
 def init_llm():
@@ -24,10 +27,10 @@ def init_llm():
           device="cuda:0",
           quantize_config=None)
 
-  system_prompt = "You are a document querying assistant. Your goal is to answer customer text concisely. Organize your thoughts into numbered points as often as possible, if applicable.  If you do not know the answer, your only answer is: I'm sorry. I didn't quite understand. Can you rephrase your question?"
+  system_prompt = "You are an AI assistant that helps physicians diagnose patients. You are given a patient's symptoms and you must diagnose the patient, or answer questions related to the patient to the best of your ability."
 
   llm = HuggingFaceLLM(context_window=4096,
-                      max_new_tokens=256,
+                      max_new_tokens=2048,
                       model=model,
                       tokenizer=tokenizer,
                       system_prompt=system_prompt,
@@ -48,4 +51,12 @@ def init_llm():
   index = VectorStoreIndex.from_documents(documents, service_context=service_context, show_progress=True)
   query_engine = index.as_query_engine()
   print('Done loading index. Ready for queries.\n')
+  return query_engine
+
+def init_gpt():
+  llm_predictor = LLMPredictor(llm=ChatOpenAI(temperature=0.7, model_name="gpt-3.5-turbo", max_tokens=512))
+  service_context = ServiceContext.from_defaults(chunk_size=1024)
+  documents = SimpleDirectoryReader(PATHS.documents).load_data()
+  index = GPTVectorStoreIndex(documents, service_context=service_context, show_progress=True)
+  query_engine = index.as_query_engine()
   return query_engine

@@ -1,0 +1,28 @@
+digraph MedicalLMMFlow {
+	node [fontname=Calibri shape=box style=filled]
+	A [label=<Patient Data<BR /><FONT POINT-SIZE="10">Symptoms, History, Tests<BR />Transmitted Securely: Encryption, Local Servers</FONT>> fillcolor=lightblue]
+	F [label=<External API<BR /><FONT POINT-SIZE="10">Feeds in Research Articles</FONT>> fillcolor=lightcyan]
+	G [label=<Hospital Data<BR /><FONT POINT-SIZE="10">Relevant Hospital Records</FONT>> fillcolor=orange]
+	subgraph cluster_LMM {
+		label=<LMM Processing<BR /><FONT POINT-SIZE="10">(Interchangeable: e.g., PaLM2)</FONT>> rank=same
+		H [label=<Transformer Validator<BR /><FONT POINT-SIZE="10">Ensures Non-hallucinatory Responses<BR />Using Entity Extraction</FONT>> fillcolor=lavender]
+		B [label=<LMM Model<BR /><FONT POINT-SIZE="10">Processes patient data &amp;<BR />Queries External API</FONT>> fillcolor=lightgray]
+		H -> B
+	}
+	subgraph cluster_UI {
+		label="Frontend UI for Doctors" style=dashed
+		I [label="" style=invis width=0]
+		C [label=<Medical Literature Synthesis<BR /><FONT POINT-SIZE="10">Integration of research articles and hospital data</FONT>> fillcolor=lightyellow]
+		D [label=<Differential Diagnoses Output<BR /><FONT POINT-SIZE="10">Generated list based on data</FONT>> fillcolor=lightpink]
+		E [label=<Cited Medical References<BR /><FONT POINT-SIZE="10">Relevant literature sources</FONT>> fillcolor=lightgreen]
+	}
+	A -> B [dir=e]
+	B -> F [label=Queries dir=e]
+	A -> G [dir=w]
+	G -> B [dir=w]
+	B -> D [dir=ne]
+	D -> C [dir=e]
+	C -> D [dir=w]
+	D -> E [dir=e]
+	E -> D [dir=w]
+}
