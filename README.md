@@ -1,5 +1,5 @@
 
-# Trench LLC Gen AI Web App
+# Simple Web Application to Query Documents using LlamaIndex + Your local LLM Model
 ## Getting Started
 
 ### Overview
