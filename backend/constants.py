@@ -2,7 +2,7 @@
 
 class SECRETS:
     class KEYS:
-        OPEN_AI_KEY = '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'
+        OPEN_AI_KEY = ''
 
 
 class MODELS:
